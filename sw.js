@@ -1,7 +1,6 @@
 /**
  * Service Worker - منصة نهج الأوائل
- * يدعم: التخزين المؤقت، العمل Offline، مزامنة الخلفية
- * بدون مكتبات خارجية للرياضيات
+ * يدعم: التخزين المؤقت، العمل Offline، مزامنة الخلفية (يرسل إعلاماً للصفحات المفتوحة لمزامنة البيانات)
  */
 
 const CACHE_NAME = 'nahj-alawael-v3';
@@ -17,7 +16,6 @@ const scopeBase = (typeof self !== 'undefined' && self.registration && self.regi
     : './';
 
 function resolveUrl(path) {
-    // Accept './', 'index.html', 'css/style.css' etc and return absolute URL string
     try {
         return new URL(path, scopeBase).href;
     } catch (e) {
@@ -69,7 +67,6 @@ const FONT_ASSETS = [
 ];
 
 // ==================== التثبيت ====================
-
 self.addEventListener('install', (event) => {
     console.log('[SW] Installing...');
 
@@ -101,7 +98,6 @@ self.addEventListener('install', (event) => {
 });
 
 // ==================== التنشيط ====================
-
 self.addEventListener('activate', (event) => {
     console.log('[SW] Activating...');
 
@@ -130,13 +126,11 @@ self.addEventListener('activate', (event) => {
 });
 
 // ==================== الجلب ====================
-
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    if (url.pathname.includes('analytics') || 
-        url.pathname.includes('tracking')) {
+    if (url.pathname.includes('analytics') || url.pathname.includes('tracking')) {
         return;
     }
 
@@ -160,7 +154,6 @@ self.addEventListener('fetch', (event) => {
 });
 
 // ==================== استراتيجيات التخزين ====================
-
 async function cacheFirst(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
@@ -246,7 +239,7 @@ async function networkFirstWithCache(request, cacheName) {
             return new Response(
                 JSON.stringify({ 
                     error: 'offline',
-                    message: 'أنت في وضع عدم الاتصال. سيتم المزامنة لاحق��ً.' 
+                    message: 'أنت في وضع عدم الاتصال. سيتم المزامنة لاحقاً.' 
                 }),
                 {
                     status: 503,
@@ -272,7 +265,6 @@ async function networkWithCacheFallback(request, cacheName) {
         if (cached) return cached;
 
         if (request.mode === 'navigate') {
-            // fall back to index.html within scope
             const indexUrl = resolveUrl('index.html');
             const match = await cache.match(indexUrl);
             if (match) return match;
@@ -281,8 +273,7 @@ async function networkWithCacheFallback(request, cacheName) {
     }
 }
 
-// ==================== مزامنة الخلفية ====================
-
+// ==================== مزامنة الخلفية (مرسل إشعار للصفحات المفتوحة) ====================
 self.addEventListener('sync', (event) => {
     if (event.tag === 'sync-exam-results') {
         event.waitUntil(syncExamResults());
@@ -292,33 +283,50 @@ self.addEventListener('sync', (event) => {
 });
 
 async function syncExamResults() {
-    const db = await openDB('NahjOfflineDB', 1);
-    const pendingResults = await db.getAll('pendingResults');
+    try {
+        const db = await openDB('NahjOfflineDB', 1);
+        const pendingResults = await db.getAll('pendingResults');
+        if (!pendingResults || pendingResults.length === 0) return;
 
-    for (const result of pendingResults) {
-        try {
-            const response = await fetch('/api/submit-result', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(result)
-            });
-            if (response.ok) {
-                await db.delete('pendingResults', result.id);
-            }
-        } catch (error) {
-            console.error('[SW] Sync failed for result:', error);
+        // Instead of trying to POST from the service worker (which lacks the app's supabase client),
+        // notify any open client pages to perform the actual sync using their authenticated context.
+        const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const client of clientList) {
+            client.postMessage({ type: 'SYNC_PENDING_RESULTS', resultsCount: pendingResults.length });
         }
+    } catch (err) {
+        console.error('[SW] syncExamResults failed:', err);
     }
 }
 
-// ==================== الإشعارات ====================
+async function syncClassData() {
+    try {
+        const db = await openDB('NahjOfflineDB', 1);
+        const pendingContent = await db.getAll('pendingContent');
+        if (!pendingContent || pendingContent.length === 0) return;
+        const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const client of clientList) {
+            client.postMessage({ type: 'SYNC_PENDING_CONTENT', items: pendingContent.length });
+        }
+    } catch (err) {
+        console.error('[SW] syncClassData failed:', err);
+    }
+}
 
+// ==================== الإ��عارات ====================
 self.addEventListener('push', (event) => {
-    const data = event.data.json();
+    let data = {};
+    try {
+        data = event.data ? event.data.json() : {};
+    } catch (e) {
+        console.warn('[SW] push event has no JSON data', e);
+        data = { title: 'نهج الأوائل', body: 'لديك إشعار جديد' };
+    }
+
     const options = {
-        body: data.body,
-        icon: '/img/icon48x48.png',
-        badge: '/img/icon48x48.png',
+        body: data.body || '',
+        icon: resolveUrl('img/icon48x48.png'),
+        badge: resolveUrl('img/icon48x48.png'),
         tag: data.tag || 'nahj-notification',
         requireInteraction: data.requireInteraction || false,
         actions: data.actions || [],
@@ -326,36 +334,36 @@ self.addEventListener('push', (event) => {
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title, options)
+        self.registration.showNotification(data.title || 'نهج الأوائل', options)
     );
 });
 
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    const notificationData = event.notification.data;
+    const notificationData = event.notification.data || {};
 
     event.waitUntil(
-        clients.matchAll({ type: 'window' }).then((clientList) => {
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
             for (const client of clientList) {
-                if (client.url === '/' && 'focus' in client) {
-                    client.postMessage({
-                        type: 'notification-click',
-                        data: notificationData
-                    });
-                    return client.focus();
+                // prefer focusing a client that is within our scope
+                try {
+                    if (client.url && client.url.indexOf(scopeBase) === 0 && 'focus' in client) {
+                        client.postMessage({ type: 'notification-click', data: notificationData });
+                        return client.focus();
+                    }
+                } catch (e) {
+                    // ignore cross-origin / access issues
                 }
             }
             if (clients.openWindow) {
-                return clients.openWindow(notificationData.url || '/');
+                return clients.openWindow(notificationData.url || scopeBase);
             }
         })
     );
 });
 
 // ==================== دوال مساعدة ====================
-
 function isStaticAsset(url) {
-    // use includes so paths work when app is served from a project subpath (GitHub Pages)
     const staticPaths = ['/css/', '/js/', '/img/', '/assets/'];
     return staticPaths.some(path => url.pathname.includes(path));
 }
@@ -402,8 +410,8 @@ function openDB(name, version) {
 }
 
 // ==================== رسائل من التطبيق ====================
-
 self.addEventListener('message', (event) => {
+    if (!event.data) return;
     if (event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     } else if (event.data.type === 'CLEAR_CACHE') {
@@ -413,7 +421,7 @@ self.addEventListener('message', (event) => {
     } else if (event.data.type === 'GET_CACHE_SIZE') {
         getCacheSize().then(size => {
             event.ports[0].postMessage({ size });
-        });
+        }).catch(()=>{});
     }
 });
 
@@ -425,8 +433,13 @@ async function getCacheSize() {
         const requests = await cache.keys();
         for (const request of requests) {
             const response = await cache.match(request);
-            const blob = await response.blob();
-            totalSize += blob.size;
+            if (!response) continue;
+            try {
+                const blob = await response.blob();
+                totalSize += blob.size;
+            } catch (e) {
+                // some responses can't be read as blob (opaque), skip
+            }
         }
     }
     return {
