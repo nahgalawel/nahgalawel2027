@@ -11,29 +11,43 @@ const CDN_CACHE = 'nahj-cdn-v3';
 const FONT_CACHE = 'nahj-fonts-v3';
 const IMAGE_CACHE = 'nahj-images-v3';
 
-// الملفات الأساسية للتطبيق (محلية)
+// helper: compute scope base so URLs work on project pages (GitHub Pages) and root sites
+const scopeBase = (typeof self !== 'undefined' && self.registration && self.registration.scope)
+    ? new URL('.', self.registration.scope).href
+    : './';
+
+function resolveUrl(path) {
+    // Accept './', 'index.html', 'css/style.css' etc and return absolute URL string
+    try {
+        return new URL(path, scopeBase).href;
+    } catch (e) {
+        return path;
+    }
+}
+
+// الملفات الأساسية للتطبيق (محلية) - استخدم مسارات نسبية ثم حَ��ِّلها لروابط كاملة ضمن scope
 const STATIC_ASSETS = [
-    '/',
-    '/index.html',
-    '/css/normalize.css',
-    '/css/animate.css',
-    '/css/style.css',
-    '/js/jquery-3.1.1.min.js',
-    '/js/jquery-ui.min.js',
-    '/js/jquery.ns-autogrow.min.js',
-    '/js/sweetAlert.js',
-    '/js/crypto.js',
-    '/js/lan_ar.js',
-    '/js/script.js',
-    '/js/goTo_pages.js',
-    '/js/home.js',
-    '/js/mytest.js',
-    '/js/newtest.js',
-    '/js/page_result.js',
-    '/js/search.js',
-    '/img/icon48x48.png',
-    '/img/load.gif'
-];
+    './',
+    'index.html',
+    'css/normalize.css',
+    'css/animate.css',
+    'css/style.css',
+    'js/jquery-3.1.1.min.js',
+    'js/jquery-ui.min.js',
+    'js/jquery.ns-autogrow.min.js',
+    'js/sweetAlert.js',
+    'js/crypto.js',
+    'js/lan_ar.js',
+    'js/script.js',
+    'js/goTo_pages.js',
+    'js/home.js',
+    'js/mytest.js',
+    'js/newtest.js',
+    'js/page_result.js',
+    'js/search.js',
+    'img/icon48x48.png',
+    'img/load.gif'
+].map(resolveUrl);
 
 // مكتبات CDN للتخزين المؤقت (للموارد الخارجية)
 const CDN_ASSETS = [
@@ -58,7 +72,7 @@ const FONT_ASSETS = [
 
 self.addEventListener('install', (event) => {
     console.log('[SW] Installing...');
-    
+
     event.waitUntil(
         Promise.all([
             caches.open(STATIC_CACHE).then((cache) => {
@@ -90,7 +104,7 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
     console.log('[SW] Activating...');
-    
+
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -120,16 +134,16 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
-    
+
     if (url.pathname.includes('analytics') || 
         url.pathname.includes('tracking')) {
         return;
     }
-    
+
     if (request.method !== 'GET') {
         return;
     }
-    
+
     if (isStaticAsset(url)) {
         event.respondWith(cacheFirst(request, STATIC_CACHE));
     } else if (isCDNAsset(url)) {
@@ -151,7 +165,7 @@ async function cacheFirst(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
     if (cached) return cached;
-    
+
     try {
         const response = await fetch(request);
         if (response.ok) {
@@ -167,21 +181,21 @@ async function cacheFirst(request, cacheName) {
 async function staleWhileRevalidate(request, cacheName) {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
-    
+
     const fetchPromise = fetch(request).then((response) => {
         if (response.ok) {
             cache.put(request, response.clone());
         }
         return response;
     }).catch(() => cached);
-    
+
     return cached || fetchPromise;
 }
 
 async function cacheFirstWithExpiry(request, cacheName, maxAge) {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
-    
+
     if (cached) {
         const dateHeader = cached.headers.get('sw-date');
         if (dateHeader) {
@@ -193,7 +207,7 @@ async function cacheFirstWithExpiry(request, cacheName, maxAge) {
             return cached;
         }
     }
-    
+
     try {
         const response = await fetch(request);
         if (response.ok) {
@@ -216,7 +230,7 @@ async function cacheFirstWithExpiry(request, cacheName, maxAge) {
 
 async function networkFirstWithCache(request, cacheName) {
     const cache = await caches.open(cacheName);
-    
+
     try {
         const networkResponse = await fetch(request);
         if (networkResponse.ok) {
@@ -227,12 +241,12 @@ async function networkFirstWithCache(request, cacheName) {
         console.log('[SW] Network failed, trying cache:', error);
         const cached = await cache.match(request);
         if (cached) return cached;
-        
+
         if (request.url.includes('supabase')) {
             return new Response(
                 JSON.stringify({ 
                     error: 'offline',
-                    message: 'أنت في وضع عدم الاتصال. سيتم المزامنة لاحقاً.' 
+                    message: 'أنت في وضع عدم الاتصال. سيتم المزامنة لاحق��ً.' 
                 }),
                 {
                     status: 503,
@@ -256,9 +270,12 @@ async function networkWithCacheFallback(request, cacheName) {
         const cache = await caches.open(cacheName);
         const cached = await cache.match(request);
         if (cached) return cached;
-        
+
         if (request.mode === 'navigate') {
-            return cache.match('/index.html');
+            // fall back to index.html within scope
+            const indexUrl = resolveUrl('index.html');
+            const match = await cache.match(indexUrl);
+            if (match) return match;
         }
         throw error;
     }
@@ -277,7 +294,7 @@ self.addEventListener('sync', (event) => {
 async function syncExamResults() {
     const db = await openDB('NahjOfflineDB', 1);
     const pendingResults = await db.getAll('pendingResults');
-    
+
     for (const result of pendingResults) {
         try {
             const response = await fetch('/api/submit-result', {
@@ -307,7 +324,7 @@ self.addEventListener('push', (event) => {
         actions: data.actions || [],
         data: data.data || {}
     };
-    
+
     event.waitUntil(
         self.registration.showNotification(data.title, options)
     );
@@ -316,7 +333,7 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
     const notificationData = event.notification.data;
-    
+
     event.waitUntil(
         clients.matchAll({ type: 'window' }).then((clientList) => {
             for (const client of clientList) {
@@ -338,8 +355,9 @@ self.addEventListener('notificationclick', (event) => {
 // ==================== دوال مساعدة ====================
 
 function isStaticAsset(url) {
+    // use includes so paths work when app is served from a project subpath (GitHub Pages)
     const staticPaths = ['/css/', '/js/', '/img/', '/assets/'];
-    return staticPaths.some(path => url.pathname.startsWith(path));
+    return staticPaths.some(path => url.pathname.includes(path));
 }
 
 function isCDNAsset(url) {
