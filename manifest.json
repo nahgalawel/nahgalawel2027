@@ -1,0 +1,21 @@
+{
+  "name": "منصة نهج الأوائل",
+  "short_name": "نهج",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "description": "منصة اختبارات الفصول الإلكترونية - نهج الأوائل",
+  "icons": [
+    {
+      "src": "img/icon48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
