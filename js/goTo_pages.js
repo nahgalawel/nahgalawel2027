@@ -1,10 +1,47 @@
-function go_page(_0x73cbx2) { $('#' + _0x73cbx2)['siblings']()['hide']();
-    $('#' + _0x73cbx2)['show'](); if (_0x73cbx2 == 'page_result') { localStorage['prev_page_demo'] = 'page_result' } else { if (_0x73cbx2 == 'prev_exam') { localStorage['prev_page_demo'] = 'prev_exam';
-            $('#btnEditExam')['hide']();
-            $('#btnAddExam')['show']();
-            edit_ask_mode = '<script>moodeIs = undefined; </' + 'script>';
-            $('#form_new_ask')['append'](edit_ask_mode) } else { if (_0x73cbx2 != 'page_newtest') { $('#btnEditExam')['hide']();
-                $('#btnAddExam')['show']();
-                edit_ask_mode = '<script>moodeIs = undefined; </' + 'script>';
-                $('#form_new_ask')['append'](edit_ask_mode) } } }; if (_0x73cbx2 == 'page_home' || _0x73cbx2 == 'page_setting' || _0x73cbx2 == 'prev_exam') { setTimeout(function() { localStorage['router'] = '';
-            reset_App() }, 1000) } }
+function go_page(pageId) {
+    $('.my_pages > div').addClass('Dnone');
+    $('#' + pageId).removeClass('Dnone');
+    
+    // إخفاء أو إظهار شريط التنقل السفلي حسب الصفحة
+    if (pageId === 'page_mytest') {
+        $('#nav-bottom').hide();
+    } else {
+        $('#nav-bottom').show();
+    }
+
+    // تحديث البيانات تلقائياً عند الانتقال لصفحة الاختباراتي
+    if (pageId === 'prev_exam') {
+        readAll_ans_saveded_new();
+        if (typeof readAll_exam_saveded_new === 'function' && loginState === 'login=OK') {
+            readAll_exam_saveded_new('update');
+        }
+    }
+}
+
+function backToPrev_page() {
+    if (confirm('هل أنت متأكد من الخروج من الاختبار؟ سيتم فقدان تقدمك.')) {
+        go_page('page_home');
+        $('#Tasleem').addClass('Dnone');
+        $('#Takeed').removeClass('Dnone');
+    }
+}
+
+function chaneg_check_mode(mode) {
+    mode_te_st = mode;
+    localStorage['mode_te_st'] = mode;
+    if (mode === 'teacher') {
+        $('.teacher').show();
+        $('.student').hide();
+        go_page('prev_exam');
+    } else {
+        $('.teacher').hide();
+        $('.student').show();
+        go_page('page_home');
+    }
+}
+
+function chaneg_check_mode_app_lan(lan) {
+    localStorage['app_lan'] = lan;
+    app_lan = lan;
+    $('.start_mode').css('display', 'flex');
+}
