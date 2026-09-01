@@ -1,242 +1,750 @@
-var mode_te_st = localStorage['mode_te_st'];
-var page_mytest = 'page_mytest';
-var nav_bottomm = 'show';
-var isHereExamLoaded;
-var countPDF = 0;
-var admob_mode;
-var no_no = '"no"';
-var kind_me;
+function readAll_ans_saveded() {
+    readAll_ans_saveded_new();
+}
 
-function send_saved_direct() { localStorage_tafaseel_Student_Data = localStorage['tafaseel_Student_Data'];
-    localStorage_number_exam = localStorage['number_exam'];
-    localStorage_exam_data_for_std = localStorage['exam_data_for_std']; if (localStorage['mode_send_ans'] == 'no') { $('#exam_saved_st table thead td:first')['html']('<p onclick="send_ans(localStorage_tafaseel_Student_Data, localStorage_number_exam, localStorage_exam_data_for_std)" style="float: right; margin-right: 5px; margin-left: -70px; font-size: 14px; margin-top: 2px; margin-bottom: 0px;">' + lan_SendExam_tbl_std + '</p><span>' + lan_My_Exams_For_Student + '</span>');
-        go_page('prev_exam');
-        send_ans(localStorage['tafaseel_Student_Data'], localStorage['number_exam'], localStorage['exam_data_for_std']) } } setTimeout(function() { send_saved_direct() }, 3500);
-if ((/(ipad|iphone|ipod|android)/i ['test'](navigator['userAgent']))) {} else { networkState = 1;
-    kind_me = 'electron'; var navigator_info = window['navigator']; var screen_info = window['screen']; var uid = navigator_info['mimeTypes']['length'];
-    uid += navigator_info['userAgent']['replace'](/\D+/g, '');
-    uid += navigator_info['plugins']['length'];
-    uid += screen_info['height'] || '';
-    uid += screen_info['width'] || '';
-    uid += screen_info['pixelDepth'] || '';
-    uid = uid['substr'](uid['length'] - 40);
-    num_device = 'uuid: ' + uid };
-window['indexedDB'] = window['indexedDB'] || window['mozIndexedDB'] || window['webkitIndexedDB'] || window['msIndexedDB'] || window['shimIndexedDB'];
-window['IDBTransaction'] = window['IDBTransaction'] || window['webkitIDBTransaction'] || window['msIDBTransaction'];
-window['IDBKeyRange'] = window['IDBKeyRange'] || window['webkitIDBKeyRange'] || window['msIDBKeyRange'];
-device_not_support_indexedDB = 'support';
-if (!window['indexedDB']) { document['addEventListener']('deviceready', onDeviceReady2, false);
+function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString().replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
 
-    function onDeviceReady2() { deviceManufacturer = device['manufacturer']; if (deviceManufacturer == 'Apple' || deviceManufacturer == 'APPLE' || deviceManufacturer == 'apple' || deviceManufacturer == 'Android' || deviceManufacturer == 'android' || deviceManufacturer == 'ANDROID') { device_not_support_indexedDB = 'device_not_support_indexedDB' } else { device_not_support_indexedDB = 'device_not_support_indexedDB' } } } else { var db; var request = window['indexedDB']['open']('MyExsams236', 1);
-    request['onerror'] = function(_0x9f58x10) { alert('لم يتم الاتصال بقاعدة البيانات') };
-    request['onsuccess'] = function(_0x9f58x10) { db = request['result'];
-        setTimeout(function() { readAll();
-            readAll_exam_saveded() }, 1000) };
-    request['onupgradeneeded'] = function(_0x9f58x10) { var db = _0x9f58x10['target']['result']; var _0x9f58x11 = db['createObjectStore']('myTestLoaded', { keyPath: 'id' }); var _0x9f58x12 = db['createObjectStore']('myans', { keyPath: 'id' }); var _0x9f58x13 = db['createObjectStore']('myexam', { keyPath: 'id' }); var _0x9f58x14 = db['createObjectStore']('blobs', { keyPath: 'id' }) } };
+async function readAll_exam_saveded_new(action) {
+    var teacher_email = localStorage.getItem('loginEmail');
 
-function alertDismissed() {} setTimeout(function() { readAll_exam_saveded_new() }, 1000);
-setTimeout(function() { readAll_ans_saveded() }, 3000);
-document['addEventListener']('deviceready', onDeviceReady4, false);
+    if (!teacher_email) {
+        $('#exam_saved_te #exam_saved_forAdd').html('<tr><td colspan="3">الرجاء تسجيل الدخول لعرض اختباراتك المنشورة</td></tr>');
+        return;
+    }
 
-function onDeviceReady4() { if (deviceManufacturer == 'Apple' || deviceManufacturer == 'APPLE' || deviceManufacturer == 'apple' || deviceManufacturer == 'Android' || deviceManufacturer == 'android' || deviceManufacturer == 'ANDROID') { readAll_ans_saveded_new() } }
-if (kind_me == 'elctron') { setTimeout(function() { readAll_ans_saveded_new() }, 500) };
+    let { data, error } = await window._supabase
+        .from('exams')
+        .select('*')
+        .eq('teacher_email', teacher_email)
+        .order('id', { ascending: false });
 
-function downloadExam_new() { if (myObj['kind_download'] == 'indexedDB') { if (device_not_support_indexedDB == 'device_not_support_indexedDB') { if (myObj['kind_download'] == 'indexedDB') { if (deviceManufacturer == 'Apple' || deviceManufacturer == 'APPLE' || deviceManufacturer == 'apple' || deviceManufacturer == 'Android' || deviceManufacturer == 'android' || deviceManufacturer == 'ANDROID') { navigator['notification']['alert'](lan_msg_non_support, alertDismissed, lan_word_please, lan_ok) } else { alert('عفوا جهازك لا يدعم تحميل هذا الاختبار .. استخدم جهاز آخر أو تواصل مع معلمك ليقوم بتغيير إعدادات الاختبار') } } } else { downloadExam() } } else { $('#exam_loaded_forAdd')['empty']();
-        exam_data = JSON['stringify'](myObj);
-        exam_data2 = '' + exam_data + '';
-        kind_download_for_start_exam = '"direct"';
-        num = $('#num_exam')['val']();
-        $('#exam_loaded_forAdd')['append']('' + '<tr><td width=\'50%\' onclick=\'start_exam(' + num + ',' + exam_data2 + ', ' + no_no + ', ' + no_no + ', ' + kind_download_for_start_exam + ' )\'>' + exam_name + '<br>' + lan_word_start + ' <i class=\'fas fa-sign-in-alt gre animated infinite wobble\'></i>' + '</td><td style=\'padding: 5px;\'>' + num + '</td><td width=\'50%\' onclick=\'remove_exam(' + +num + ')\'>' + exam_info + '<br>' + lan_word_delete + ' <i class=\'fas fa-minus-circle rem\'></i>' + '</td></tr>');
-        show_search();
-        $('#load')['css']('display', 'none') } }
+    if (error) {
+        console.error('Error fetching exams:', error.message);
+        $('#exam_saved_te #exam_saved_forAdd').html('<tr><td colspan="3">خطأ في جلب الاختبارات من السحابة</td></tr>');
+        return;
+    }
 
-function readAll() { $('#exam_loaded_forAdd')['empty'](); var _0x9f58x11 = db['transaction']('myTestLoaded')['objectStore']('myTestLoaded');
-    _0x9f58x11['openCursor']()['onsuccess'] = function(_0x9f58x10) { var _0x9f58x19 = _0x9f58x10['target']['result']; if (_0x9f58x19) { cursorValueExam_data = '' + _0x9f58x19['value']['exam_data'] + '';
-            $('#exam_loaded_forAdd')['append']('' + '<tr><td width=\'50%\' onclick=\'start_exam(' + _0x9f58x19['key'] + ',' + cursorValueExam_data + ' )\'>' + _0x9f58x19['value']['exam_name'] + '<br>' + lan_word_start + ' <i class=\'fas fa-sign-in-alt gre animated infinite wobble\'></i>' + '</td><td style=\'padding: 5px;\'>' + _0x9f58x19['key'] + '</td><td width=\'50%\' onclick=\'remove_exam(' + +_0x9f58x19['key'] + ')\'>' + _0x9f58x19['value']['exam_info'] + '<br>' + lan_word_delete + ' <i class=\'fas fa-minus-circle rem\'></i>' + '</td></tr>');
-            isHereExamLoaded = 'yes';
-            _0x9f58x19['continue']() } else { if (isHereExamLoaded != 'yes') { $('#exam_loaded_forAdd')['append']('<td colspan=\'5\'>' + lan_You_have_not_downloaded_any_exam_yet + '</td>') } } } }
-var one_blob = {};
-slove = '<script> add_script_blob_loop(); </' + 'script> ';
+    if (!data || data.length === 0) {
+        $('#exam_saved_te #exam_saved_forAdd').html('<tr><td colspan="3">لم تقم بإنشاء أي اختبار حتى الآن</td></tr>');
+        readAll_student_exams_sync([]);
+        return;
+    }
 
-function downloadExam() { $('#load')['css']('display', 'inline-block');
-    $('#btnDown')['parent']()['css']('display', 'none');
-    $('#btnDown')['parent']()['next']()['attr']('colspan', 2);
-    myObj = JSON['parse'](exam_data);
-    load_blob = 0;
-    load_blob_yes = 0;
-    count_blob = 0;
-    add_script_blobs() }
+    syncTeacherExamsToStudentStorage(data);
 
-function add_script_blobs() { count_blob++;
-    add_scr_blob = '<script> if (myObj.img_val_ASK' + count_blob + ' != \'\' && myObj.img_val_ASK' + count_blob + ' != \'undefined\') {load_blob_yes++; fetch(myObj.img_val_ASK' + count_blob + ').then(function(response) { return response.blob(); }).then(function(myBlob) { one_blob.img_ASK' + count_blob + ' = myBlob; load_blob++; }).catch(function(error) {load_blob_yes--; myObj.img_val_ASK' + count_blob + ' = \'\'; console.log(\'error = \' + error)}); } </' + 'script>';
-    $('body')['append'](add_scr_blob);
-    add_script_blob_loop() }
+    var html = '';
+    data.forEach(exam => {
+        html += `<tr>
+            <td style="font-weight:800; text-align:right; padding-right:15px;">${exam.exam_name}</td>
+            <td><code style="background:#e2e8f0; padding:3px 8px; border-radius:4px; font-weight:bold;">${exam.exam_number}</code></td>
+            <td>
+                <div style="display:flex; gap:4px; justify-content:center; flex-wrap:wrap;">
+                    <button class="desine-btn" style="padding:5px 8px; font-size:0.75rem; background:#10b981; margin:0;" onclick="viewExamResultsByNum(${exam.exam_number})" title="النتائج"><i class="fas fa-chart-bar"></i> النتائج</button>
+                    <button class="desine-btn" style="padding:5px 8px; font-size:0.75rem; background:#0284c7; margin:0;" onclick="editThisExam(${exam.exam_number})" title="تعديل"><i class="fas fa-edit"></i> تعديل</button>
+                    <button class="desine-btn" style="padding:5px 8px; font-size:0.75rem; background:#ef4444; margin:0;" onclick="deleteThisExamByNum(${exam.exam_number})" title="حذف"><i class="fas fa-trash"></i> حذف</button>
+                </div>
+            </td>
+        </tr>`;
+    });
 
-function add_script_blob_loop() { if (myObj['count_ask'] > count_blob) { add_script_blobs() } else { setTimeout(function() { if (load_blob == load_blob_yes) { if (load_blob_yes == 0) { downloadExam2() } else { loopLoad() } } else { loopLoad() } }, 500) } }
+    $('#exam_saved_te #exam_saved_forAdd').html(html);
+    readAll_student_exams_sync(data);
+}
 
-function loopLoad() { if (load_blob == load_blob_yes) { add_blob = '<script> all_blob = one_blob; </' + 'script>';
-        $('body')['append'](add_blob);
-        setTimeout(function() { add_scr_blob_save = '<script> var request = db.transaction([\'blobs\'], \'readwrite\').objectStore(\'blobs\').add({ id: num, blob: all_blob }); request.onsuccess = function(event) { downloadExam2() }; request.onerror = function() { var request = db.transaction([\'blobs\'], \'readwrite\').objectStore(\'blobs\').put({ id: num, blob: all_blob }); request.onsuccess = function(event) { downloadExam2() } }; </' + 'script>';
-            $('body')['append'](add_scr_blob_save) }, 500) } else { loopLoad2() } }
+function syncTeacherExamsToStudentStorage(teacherExams) {
+    let savedExams = JSON.parse(localStorage.getItem('downloaded_exams') || '[]');
+    
+    teacherExams.forEach(tExam => {
+        let exists = savedExams.some(e => e.exam_number == tExam.exam_number);
+        if (!exists) {
+            savedExams.push(tExam);
+        } else {
+            let index = savedExams.findIndex(e => e.exam_number == tExam.exam_number);
+            if (index !== -1) {
+                savedExams[index] = tExam;
+            }
+        }
+    });
+    localStorage.setItem('downloaded_exams', JSON.stringify(savedExams));
+}
 
-function loopLoad2() { setTimeout(function() { loopLoad() }, 3000) }
+function readAll_student_exams_sync(teacherExamsData) {
+    let savedExams = JSON.parse(localStorage.getItem('downloaded_exams') || '[]');
+    
+    if (savedExams.length === 0) {
+        $('#exam_saved_st #ans_saved_forAdd').html('<tr><td colspan="3">لم تقم بحفظ أي اختبار للطالب محلياً حتى الآن</td></tr>');
+        return;
+    }
 
-function downloadExam2() { $('#btnDown')['parent']()['css']('display', 'table-cell');
-    $('#btnDown')['parent']()['next']()['attr']('colspan', 1);
-    exam_data = JSON['stringify'](myObj); var request = db['transaction'](['myTestLoaded'], 'readwrite')['objectStore']('myTestLoaded')['add']({ id: document['getElementById']('num_exam')['value'], exam_name: exam_name, exam_info: exam_info, exam_data: exam_data });
-    request['onsuccess'] = function(_0x9f58x10) { Swal['fire']({ type: 'success', title: lan_msg_success_download_exam1, text: lan_msg_success_download_exam2, confirmButtonText: lan_ok });
-        $('#load')['css']('display', 'none');
-        $('#result_search')['fadeOut']();
-        $('#show_search')['delay'](400)['fadeIn']();
-        readAll() };
-    request['onerror'] = function(_0x9f58x10) { var request = db['transaction'](['myTestLoaded'], 'readwrite')['objectStore']('myTestLoaded')['put']({ id: document['getElementById']('num_exam')['value'], exam_name: exam_name, exam_info: exam_info, exam_data: exam_data });
-        request['onsuccess'] = function(_0x9f58x10) { Swal['fire']({ type: 'success', title: lan_msg_success_download_exam1, text: lan_msg_success_download_exam2, confirmButtonText: lan_ok });
-            $('#load')['css']('display', 'none');
-            $('#result_search')['fadeOut']();
-            $('#show_search')['delay'](400)['fadeIn']();
-            readAll() } } }
+    var html = '';
+    savedExams.forEach(exam => {
+        let studentGrades = JSON.parse(localStorage.getItem('student_grades') || '{}');
+        let myGradeBox = studentGrades[exam.exam_number] 
+            ? `<div style="background:#dcfce7; color:#166534; padding:4px 10px; border-radius:6px; font-weight:bold; display:inline-block; margin-top:4px;">الدرجة: ${studentGrades[exam.exam_number]}</div>` 
+            : `<div style="background:#f1f5f9; color:#64748b; padding:4px 10px; border-radius:6px; font-size:0.85rem; display:inline-block; margin-top:4px;">لم تختبر بعد</div>`;
 
-function remove_exam(_0x9f58x22) { if (device_not_support_indexedDB != 'device_not_support_indexedDB') { var request = db['transaction'](['myTestLoaded'], 'readwrite')['objectStore']('myTestLoaded')['delete'](_0x9f58x22.toString());
-        request['onsuccess'] = function() { if (state_exam != 'now') { Swal['fire']({ type: 'error', text: lan_msg_success_exam_deleted, showConfirmButton: false, timer: 1500 }) };
-            readAll(); var request = db['transaction'](['blobs'], 'readwrite')['objectStore']('blobs')['delete'](_0x9f58x22.toString());
-            request['onsuccess'] = function() {} } } else { readAll() } }
-var fast_lan;
-var chaneg_lan;
+        html += `<tr>
+            <td style="text-align:right; padding-right:15px;"><b>${exam.exam_name}</b><br>${myGradeBox}</td>
+            <td><code style="background:#e2e8f0; padding:3px 8px; border-radius:4px; font-weight:bold;">${exam.exam_number}</code></td>
+            <td>
+                <div style="display:flex; gap:5px; justify-content:center; flex-wrap:wrap;">
+                    <button class="desine-btn" style="padding:6px 12px; font-size:0.85rem; background:#2563eb; margin:0;" onclick="startDownloadedExam(${exam.exam_number})">
+                        <i class="fas fa-play"></i> فتح الاختبار
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+    });
 
-function check_mode_app_lan(_0x9f58x26) { if (_0x9f58x26 == undefined || _0x9f58x26 == 'undefined' || _0x9f58x26 == 'no') { $('.start_mode_app_lan')['show']();
-        fast_lan = 'new';
-        setTimeout(function() { lan_run() }, 2000) } else { foo_app_lan_ar(); if (fast_lan != 'new') { setTimeout(function() { lan_run() }, 2000) } else { location['reload']() };
-        check_mode(mode_te_st) }; if (chaneg_lan == 'yes') { location['reload']() } }
+    $('#exam_saved_st #ans_saved_forAdd').html(html);
+}
 
-function chaneg_check_mode_app_lan(_0x9f58x28) { app_lan = localStorage['app_lan'] = _0x9f58x28;
-    $('.start_mode_app_lan')['fadeOut']();
-    check_mode_app_lan(app_lan) } check_mode_app_lan(app_lan);
+function viewExamResultsByNum(examNum) {
+    window.currentExamNumberForResults = examNum;
+    go_page('page_result');
+    load_exam_results(examNum);
+}
 
-function check_mode(mode_te_st) { if (mode_te_st == 'teacher') { $('.teacher')['show']();
-        $('.student')['hide']() } else { if (mode_te_st == 'student') { $('.teacher')['hide']();
-            $('.student')['show']() } else { $('.start_mode')['show']() } } }
+function editThisExam(examNum) {
+    window.editingExamNumber = examNum;
+    $('#load').show();
+    
+    window._supabase
+        .from('exams')
+        .select('*')
+        .eq('exam_number', examNum)
+        .single()
+        .then(({ data, error }) => {
+            $('#load').hide();
+            if (error || !data) {
+                alert('تعذر تحميل بيانات الاختبار للتعديل');
+                return;
+            }
+            $('#t_name').val(data.exam_name);
+            $('#t_info').val(data.exam_info);
+            $('#t_zoom_link').val(data.zoom_link || '');
+            
+            if (data.settings) {
+                $('#Pass_start_ckeck').prop('checked', data.settings.pass_start_check || false);
+                if(data.settings.pass_start_check) $('#input_Pass').show();
+                $('#t_pass_start').val(data.settings.t_pass_start || '');
+                $('#Time_test_ckeck').prop('checked', data.settings.time_test_check || false);
+                if(data.settings.time_test_check) $('#input_Time').show();
+                $('#Time_test').val(data.settings.time_test || '');
+                $('#Bank_test_ckeck').prop('checked', data.settings.bank_test_check || false);
+                if(data.settings.bank_test_check) $('#input_Bank').show();
+                $('#Bank_test').val(data.settings.bank_test || '');
+                $('#RandomAsk').prop('checked', data.settings.random_ask || false);
+                $('#RandomAnswers').prop('checked', data.settings.random_answers || false);
+            }
+            
+            $('#form_new_ask').html('');
+            questionCount = 0;
+            
+            if (data.exam_data && data.exam_data.questions) {
+                data.exam_data.questions.forEach(q => {
+                    add_ask();
+                    let currentBox = $('#form_new_ask .question_box').last();
+                    currentBox.find('.inputAsk').val(q.question);
+                    let ansInputs = currentBox.find('.inputAns');
+                    if (q.options) {
+                        q.options.forEach((opt, idx) => {
+                            if (ansInputs[idx]) {
+                                $(ansInputs[idx]).val(opt);
+                            }
+                        });
+                    }
+                });
+            }
+            go_page('page_newtest');
+            $('#btnAddExam').text('تحديث وحفظ التعديلات');
+        });
+}
 
-function chaneg_check_mode(_0x9f58x28) { var mode_te_st = localStorage['mode_te_st'] = _0x9f58x28;
-    $('.start_mode')['fadeOut']();
-    check_mode(mode_te_st) }
+async function deleteThisExamByNum(examNum) {
+    if (!confirm('هل أنت متأكد من حذف هذا الاختبار نهائياً من السحابة؟')) return;
 
-function formatAMPM(_0x9f58x2c) { var _0x9f58x2d = _0x9f58x2c['getDate'](); var _0x9f58x2e = _0x9f58x2c['getMonth']() + 1; var _0x9f58x2f = _0x9f58x2c['getFullYear'](); var _0x9f58x30 = _0x9f58x2c['getHours'](); var _0x9f58x31 = _0x9f58x2c['getMinutes'](); var _0x9f58x32 = _0x9f58x30 >= 12 ? 'pm' : 'am';
-    _0x9f58x30 = _0x9f58x30 % 12;
-    _0x9f58x30 = _0x9f58x30 ? _0x9f58x30 : 12;
-    _0x9f58x31 = _0x9f58x31 < 10 ? '0' + _0x9f58x31 : _0x9f58x31; var _0x9f58x33 = _0x9f58x2d + '/' + _0x9f58x2e + '/' + _0x9f58x2f + ' ' + _0x9f58x30 + ':' + _0x9f58x31 + ' ' + _0x9f58x32; return _0x9f58x33 }
+    let { error } = await window._supabase
+        .from('exams')
+        .delete()
+        .eq('exam_number', examNum);
 
-function parseArabic(_0x9f58x35) { return Number(_0x9f58x35['replace'](/[٠١٢٣٤٥٦٧٨٩]/g, function(_0x9f58x36) { return _0x9f58x36['charCodeAt'](0) - 1632 })['replace'](/[۰۱۲۳۴۵۶۷۸۹]/g, function(_0x9f58x36) { return _0x9f58x36['charCodeAt'](0) - 1776 })) }
-var networkState;
-forNotReplay_qed = 0;
-forNotReplay_send = 0;
-document['addEventListener']('offline', onOffline, false);
-document['addEventListener']('online', onOnline, false);
+    if (error) {
+        alert('خطأ أثناء الحذف: ' + error.message);
+    } else {
+        alert('تم حذف الاختبار بنجاح');
+        readAll_exam_saveded_new('update');
+    }
+}
 
-function onOffline() { networkState = 0; if (forNotReplay_qed == 0) { forNotReplay_qed++; if (device_not_support_indexedDB == 'support') { readAll_ans_saveded() } } else { setTimeout(function() { forNotReplay_qed = 0 }, 1500) } }
+function readAll_ans_saveded_new() {
+    readAll_student_exams_sync([]);
+}
 
-function onOnline() { networkState = 1; if (forNotReplay_send == 0) { forNotReplay_send++;
-        send_saved_direct(); if (device_not_support_indexedDB == 'support') { readAll_ans_saveded() } } else { setTimeout(function() { forNotReplay_send = 0 }, 1500) } }
+function startDownloadedExam(exam_number) {
+    let savedExams = JSON.parse(localStorage.getItem('downloaded_exams') || '[]');
+    let exam = savedExams.find(e => e.exam_number == exam_number);
+    if (!exam) {
+        alert('الاختبار غير موجود محلياً');
+        return;
+    }
 
-function getStatistics() { $['ajax']({ type: 'POST', url: 'https://app-exams.com/new_exam/getStatistics.php', success: function(_0x9f58x3b) { Statistics = JSON['parse'](_0x9f58x3b);
-            $('#num_All_use')['html'](Statistics.Ads);
-            $('#num_All_test')['html'](Statistics.Exams);
-            $('#num_All_ِAns')['html'](Statistics.Answers);
-            $('#statistics .fa-spinner')['css']('display', 'none') }, error: function() { Swal['fire']({ type: 'info', html: lan_There_is_problem_connecting_network, showConfirmButton: false, timer: 1500 }) } }) } $(document)['ready'](function() { $('*')['on']('click', function(_0x9f58x3c) { $('body')['css']('backgroundColor', color_app); if (nav_bottomm != 'hide') { if (_0x9f58x3c['target']['tagName'] != 'INPUT' && _0x9f58x3c['target']['tagName'] != 'TEXTAREA') { $('#nav-bottom')['slideDown']() } else { $('#nav-bottom')['slideUp']() } } else { $('#nav-bottom')['slideUp']() } });
-    $(document)['on']('click', 'input[type=\'text\']', function() { $(this)['focus']() });
-    $(document)['on']('click', 'textarea', function() { $(this)['focus']() });
-    $(document)['on']('click', 'input[type=\'number\']', function() { $(this)['focus']() }) });
+    // تفعيل قفل الاختبار بكلمة المرور
+    if (exam.settings && exam.settings.pass_start_check === true && exam.settings.t_pass_start && exam.settings.t_pass_start.trim() !== '') {
+        let enteredPass = prompt('هذا الاختبار محمي بكلمة مرور. الرجاء إدخال كلمة المرور للبدء:');
+        if (enteredPass !== exam.settings.t_pass_start) {
+            alert('كلمة المرور غير صحيحة!');
+            return;
+        }
+    }
 
-function getBarcode(_0x9f58x3e) { barcode = '84193' + +_0x9f58x3e * 124 + '306145' + +_0x9f58x3e * 16; return barcode }
+    window.currentActiveExam = exam;
+    $('#show_numExam').text(exam.exam_number);
+    $('#show_nameExam').text(exam.exam_name);
+    $('#show_nobzaExam').text(exam.exam_info || 'لا توجد نبذة وصفية');
 
-function showBarcode(_0x9f58x40, _0x9f58x3e) { $('#show_barcode')['empty']();
-    height_Win = $(window)['height']() / 10;
-    height_Win = $(window)['height']() - height_Win;
-    width_Win = $(window)['width']() / 10;
-    width_Win = $(window)['width']() - width_Win; if (width_Win > height_Win) { size = height_Win } else { size = width_Win };
-    width_Win = $(window)['width']() / 10;
-    width_Win = $(window)['width']() - width_Win;
-    barcodeJSON = { render: 'canvas', minVersion: 7, maxVersion: 40, ecLevel: 'H', left: 0, top: 0, size: size, fill: '#000', background: null, text: _0x9f58x40, radius: 0.3, quiet: 4, mode: 2, mSize: 0.1, mPosX: 0.5, mPosY: 0.5, label: _0x9f58x3e, fontname: 'sans', fontcolor: '#ff9818', image: null };
-    $('#show_barcode')['qrcode'](barcodeJSON);
-    $('.popup_barcode')['fadeIn'](200) }
-if (localStorage['router'] == 'prev_exam') { go_page('prev_exam') } else { if (localStorage['router'] == 'page_setting') { go_page('page_setting') } };
+    if (window.examTimerInterval) clearInterval(window.examTimerInterval);
+    if (exam.settings && exam.settings.time_test_check === true && exam.settings.time_test) {
+        let totalMinutes = parseInt(exam.settings.time_test);
+        if (totalMinutes > 0) {
+            let timeLeft = totalMinutes * 60;
+            $('#navTimeTest').removeClass('Dnone');
+            
+            window.examTimerInterval = setInterval(() => {
+                let mins = Math.floor(timeLeft / 60);
+                let secs = timeLeft % 60;
+                $('#showTimeHere').text(`${mins}:${secs < 10 ? '0' : ''}${secs}`);
+                
+                if (timeLeft <= 0) {
+                    clearInterval(window.examTimerInterval);
+                    alert('انتهى الوقت المحدد للاختبار!');
+                    get_ans_data();
+                }
+                timeLeft--;
+            }, 1000);
+        } else {
+            $('#navTimeTest').addClass('Dnone');
+        }
+    } else {
+        $('#navTimeTest').addClass('Dnone');
+    }
 
-function reset_App_tbl() { if (device_not_support_indexedDB == 'support') { readAll_ans_saveded() } } setTimeout(function() {}, 4000);
+    let zoomBtnHtml = '';
+    if (exam.zoom_link && exam.zoom_link.trim() !== '') {
+        zoomBtnHtml = `<div style="text-align:center; margin-bottom:20px;">
+            <a href="${exam.zoom_link}" target="_blank" class="desine-btn" style="background:#0284c7; text-decoration:none; display:inline-block; padding:12px 30px; font-size:1.05rem;">
+                <i class="fas fa-video"></i> الانضمام إلى الحصة الافتراضية (Zoom / Meet)
+            </a>
+        </div>`;
+    }
 
-function reset_App() { $('#mwb_list')['empty']();
-    $('#form_new_ask')['empty']();
-    $('#t_name')['val']('');
-    $('#t_info')['val']('');
-    $('#t_pass')['val']('');
-    $('#t_email')['val']('');
-    $('#auto_radio')['prop']('checked', true);
-    close_Bar2();
-    $('#Pass_start_ckeck')['prop']('checked', false);
-    PassStart();
-    $('#t_pass_start')['val']('');
-    $('#Time_test_ckeck')['prop']('checked', false);
-    TimeTest();
-    $('#Time_test')['val']('');
-    $('#Bank_test_ckeck')['prop']('checked', false);
-    Bank_Test();
-    $('#Bank_test')['val']('');
-    $('#showAnserS')['prop']('checked', true);
-    show_AnserSS();
-    $('#allow_show')['prop']('checked', true);
-    allow_showw();
-    $('#RandomAsk')['prop']('checked', false);
-    RandomAskk();
-    $('#OUT_test')['prop']('checked', true);
-    OUTtest();
-    $('#Wifi_test')['prop']('checked', false);
-    Wifitest();
-    $('#CAP_test')['prop']('checked', true);
-    CAPtest();
-    $('#direct_radio')['prop']('checked', true);
-    kind_download_direct();
-    $('#direction_rtl_radio')['prop']('checked', true);
-    direction_ask1();
-    info_exam = '';
-    data_ask = '';
-    $('#data_exam_delete')['empty']();
-    $('#add_ask_here')['empty']();
-    $('#add_ask_here')['fadeIn']();
-    $('#show_numExam')['empty']();
-    $('#show_nameExam')['empty']();
-    $('#show_nobzaExam')['empty']();
-    $('#shows_name')['val']('');
-    $('#shows_num')['val']('');
-    $('#shows_info')['val']('');
-    $('#shows_name')['prop']('disabled', false);
-    $('#shows_num')['prop']('disabled', false);
-    $('#shows_info')['prop']('disabled', false);
-    $('#shows_num')['prop']('type', 'number');
-    $('#form_new_ask')['empty']();
-    $('#navTimeTest')['css']('display', 'none');
-    nav_bottomm = 'show';
-    $('#copy_page_mytest')['empty']();
-    $('#showresult')['empty']();
-    $('.page_mytest')['css']('margin-top', '0px');
-    $('hr')['css']('display', 'block');
-    count_ask = 0;
-    add_ask() } setTimeout(function() { if (deviceManufacturer == 'Apple' || deviceManufacturer == 'APPLE' || deviceManufacturer == 'apple' || deviceManufacturer == 'Android' || deviceManufacturer == 'android' || deviceManufacturer == 'ANDROID') { window['plugins']['insomnia']['allowSleepAgain']() } }, 2000);
-getFromHash = 'no';
+    var numbers = ['⓵', '⓶', '⓷', '⓸'];
+    var qHtml = '';
+    if (exam.exam_data && exam.exam_data.questions) {
+        let allQuestions = [...exam.exam_data.questions];
+        
+        // تفعيل بنك الأسئلة (سحب عدد عشوائي لكل طالب)
+        if (exam.settings && exam.settings.bank_test_check === true && exam.settings.bank_test) {
+            let requiredCount = parseInt(exam.settings.bank_test);
+            if (requiredCount > 0 && requiredCount < allQuestions.length) {
+                allQuestions.sort(() => Math.random() - 0.5);
+                allQuestions = allQuestions.slice(0, requiredCount);
+            }
+        }
 
-function handleOpenURL(_0x9f58x44) { setTimeout(function() { langurl = _0x9f58x44['match'](/#(.*?)Z/);
-        $('#num_exam')['val'](langurl[1]);
-        getFromHash = 'yes';
-        search_exam() }, 1000) } setTimeout(function() { ver = 58;
-    $['ajax']({ type: 'GET', url: 'https://app-exams.com/new_exam/Add_Add.php', success: function(_0x9f58x3b) { data_Ad = JSON['stringify'](_0x9f58x3b);
-            data_Ad = JSON['parse'](_0x9f58x3b); if ((/(ipad|iphone|ipod)/i ['test'](navigator['userAgent']))) { if (data_Ad['ver_ios'] > ver) { $('body')['append'](data_Ad['msg_ios']) } } else { if ((/(android)/i ['test'](navigator['userAgent']))) { if (data_Ad['ver_android'] > ver) { $('body')['append'](data_Ad['msg_android']) } } else { if (data_Ad['ver_android'] > ver) { $('body')['append'](data_Ad['msg_android']) } } } }, error: function() {} }) }, 2000);
+        if (exam.settings && exam.settings.random_ask === true) {
+            allQuestions.sort(() => Math.random() - 0.5);
+        }
 
-function update_App() { $['ajax']({ type: 'GET', url: 'https://app-exams.com/new_exam/Add_Add.php', success: function(_0x9f58x3b) { data_Ad = JSON['parse'](_0x9f58x3b); if ((/(ipad|iphone|ipod)/i ['test'](navigator['userAgent']))) { $('body')['append'](data_Ad['msg_ios']) } else { if ((/(android)/i ['test'](navigator['userAgent']))) { $('body')['append'](data_Ad['msg_android']) } else { $('body')['append'](data_Ad['msg_ios']) } } } }) }
-if ((/(android)/i ['test'](navigator['userAgent']))) { $('#page_setting')['append']('<button onclick=\'navigator.app.exitApp();\' class=\'desine-btn\' style=\'background:#770000; padding: 11px 58px;\'><i class=\'fas fa-power-off\'></i> ' + lan_close_app + '</button>') };
-if ((/(ipad|iphone|ipod)/i ['test'](navigator['userAgent']))) { publisherId_ios_android = 'ca-app-pub-5984650256568061/6319187498' };
-if ((/(android)/i ['test'](navigator['userAgent']))) { publisherId_ios_android = 'ca-app-pub-5984650256568061/5486190507' };
+        window.currentActiveExamQuestionsList = allQuestions;
 
-function initAd() { if (window['plugins'] && window['plugins']['AdMob']) { window['plugins']['AdMob']['setOptions']({ publisherId: publisherId_ios_android, bannerAtTop: true, overlap: false, offsetTopBar: false, isTesting: false }) } }
+        allQuestions.forEach((q, qIndex) => {
+            let optionsList = q.options ? [...q.options] : [];
+            
+            if (exam.settings && exam.settings.random_answers === true) {
+                optionsList.sort(() => Math.random() - 0.5);
+            }
 
-function show_AdMob() { setTimeout(function() { if (mode_te_st == 'student' && admob_mode != 'hide') { window['plugins']['AdMob']['createBannerView']();
-            window['plugins']['AdMob']['showAd'](true) } }, 2500) }
-if ((/(ipad|iphone|ipod|android)/i ['test'](navigator['userAgent']))) {} else {};
-setTimeout(function() { document['addEventListener']('deviceready', function() { var _0x9f58x48 = function() { console['log']('The screenshots are allowed now again.') }; var _0x9f58x49 = function(_0x9f58x4a) { console['error']('An error ocurred : ' + _0x9f58x4a) };
-        OurCodeWorldpreventscreenshots['enable'](_0x9f58x48, _0x9f58x49) }, false) }, 2000)
+            qHtml += `<div class="question_box" data-question-index="${qIndex}" style="background:#fff; padding:20px; margin:15px auto; width:95%; border-radius:12px; border:1.5px solid #e2e8f0; text-align:right;">
+                <p style="font-weight:800; color:#1e293b; margin-bottom:5px;">السؤال رقم ${qIndex + 1}</p>
+                <div style="width:100%; min-height:45px; padding:12px 14px; border-radius:8px; border:1.5px solid var(--border-color); background-color:#f8fafc; color:#0f172a; font-weight:750; margin-bottom:15px; white-space:pre-wrap; word-break:break-word;">${q.question || ''}</div>`;
+            
+            if (optionsList.length > 0) {
+                optionsList.forEach((opt, oIndex) => {
+                    if (opt) {
+                        qHtml += `<label style="display:flex; align-items:center; justify-content:space-between; background:#f8fafc; padding:10px 14px; margin:8px 0; border-radius:8px; border:1.5px solid #cbd5e1; cursor:pointer; font-weight:750;">
+                            <div style="display:flex; align-items:center;">
+                                <span style="font-size:1.1rem; margin-left:10px; font-weight:800; color:#4338ca;">${numbers[oIndex] || ''}</span>
+                                <span>${opt}</span>
+                            </div>
+                            <input type="radio" name="q_${qIndex}" value="${opt}" style="width:18px; height:18px; cursor:pointer;">
+                        </label>`;
+                    }
+                });
+            } else {
+                qHtml += `<input type="text" class="inputMyApp inputAns" placeholder="اكتب إجابتك هنا" style="text-align:right;">`;
+            }
+            qHtml += `</div>`;
+        });
+    }
+
+    $('#add_ask_here').html(zoomBtnHtml + qHtml);
+    go_page('page_mytest');
+}
+
+// ==================== الفصول الإلكترونية المتقدمة ====================
+function goClassroomsPage() {
+    go_page('page_classrooms');
+    let isTeacher = localStorage.getItem('loginState') === 'login=OK';
+    
+    if (isTeacher) {
+        $('#teacher_class_creation_box').removeClass('Dnone').show();
+        $('#student_class_section').hide();
+        loadTeacherClassrooms();
+    } else {
+        $('#teacher_class_creation_box').addClass('Dnone').hide();
+        $('#student_class_section').show();
+        loadStudentJoinedClasses();
+    }
+}
+
+async function createNewClassroom() {
+    var className = $('#cls_name').val();
+    var teacherEmail = localStorage.getItem('loginEmail');
+
+    if (!className) {
+        alert('الرجاء إدخال اسم الفصل الدراسي');
+        return;
+    }
+    if (!teacherEmail) {
+        alert('الرجاء تسجيل الدخول أولاً');
+        return;
+    }
+
+    var classCode = 'CLS-' + Math.floor(1000 + Math.random() * 9000);
+
+    $('#load').show();
+    let { data, error } = await window._supabase
+        .from('classrooms')
+        .insert([
+            {
+                teacher_email: String(teacherEmail),
+                class_name: String(className),
+                class_code: String(classCode)
+            }
+        ]);
+    $('#load').hide();
+
+    if (error) {
+        alert('خطأ أثناء إنشاء الفصل: ' + error.message);
+    } else {
+        alert('تم إنشاء الفصل بنجاح! رمز الانضمام هو: ' + classCode);
+        $('#cls_name').val('');
+        loadTeacherClassrooms();
+    }
+}
+
+// دالة مساعدة لاستخراج الرقم من رمز الفصل
+function getClassNumber(classCode) {
+    if (!classCode) return '';
+    return classCode.replace('CLS-', '');
+}
+
+async function loadTeacherClassrooms() {
+    var rawEmail = localStorage.getItem('loginEmail');
+    if (!rawEmail) return;
+    var teacherEmail = rawEmail.trim().toLowerCase();
+
+    let { data, error } = await window._supabase
+        .from('classrooms')
+        .select('*')
+        .ilike('teacher_email', teacherEmail)
+        .order('id', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching classrooms:', error);
+        $('#classrooms_list_add').html('<tr><td colspan="3">خطأ في جلب الفصول: ' + error.message + '</td></tr>');
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        $('#classrooms_list_add').html('<tr><td colspan="3">لا توجد فصول مضافة حتى الآن</td></tr>');
+        return;
+    }
+
+    var html = '';
+    data.forEach(cls => {
+        var classNum = getClassNumber(cls.class_code);
+        html += `<tr>
+            <td style="font-weight:800; text-align:right; padding-right:15px;">${cls.class_name}</td>
+            <td><code style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:4px; font-weight:bold;">${classNum}</code></td>
+            <td>
+                <div style="display:flex; gap:4px; justify-content:center;">
+                    <button class="desine-btn" style="padding:5px 8px; font-size:0.75rem; background:#2563eb; margin:0;" onclick="manageSingleClassroom('${cls.class_code}', '${escapeHtml(cls.class_name)}')"><i class="fas fa-folder-open"></i> إدارة</button>
+                    <button class="desine-btn" style="padding:5px 8px; font-size:0.75rem; background:#0284c7; margin:0;" onclick="manageClassroom('${cls.class_code}', '${escapeHtml(cls.class_name)}')"><i class="fas fa-users"></i> الطلاب</button>
+                    <button class="desine-btn" style="padding:5px 8px; font-size:0.75rem; background:#ef4444; margin:0;" onclick="deleteClassroom(${cls.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </td>
+        </tr>`;
+    });
+
+    $('#classrooms_list_add').html(html);
+}
+
+async function studentJoinClassroom() {
+    var stdName = $('#student_join_name').val();
+    var clsCode = 'CLS-' + $('#student_join_code').val().trim();
+
+    if (!stdName || !$('#student_join_code').val().trim()) {
+        alert('الرجاء إدخال اسمك ورمز الانضمام للفصل');
+        return;
+    }
+
+    let { data: clsData, error: clsErr } = await window._supabase
+        .from('classrooms')
+        .select('*')
+        .eq('class_code', clsCode)
+        .single();
+
+    if (clsErr || !clsData) {
+        alert('رمز الفصل غير صحيح أو غير موجود.');
+        return;
+    }
+
+    $('#load').show();
+    let { error } = await window._supabase
+        .from('classroom_students')
+        .insert([
+            {
+                class_code: clsCode,
+                student_name: stdName
+            }
+        ]);
+    $('#load').hide();
+
+    if (error) {
+        if (error.code === '23505') {
+            alert('أنت منضم بالفعل إلى هذا الفصل الدراسي.');
+        } else {
+            alert('خطأ أثناء الانضمام: ' + error.message);
+        }
+    } else {
+        alert('تم الانضمام إلى الفصل بنجاح: ' + clsData.class_name);
+        $('#student_join_code').val('');
+        manageSingleClassroom(clsData.class_code, clsData.class_name);
+    }
+}
+
+async function loadStudentJoinedClasses() {
+    let { data, error } = await window._supabase
+        .from('classrooms')
+        .select('*')
+        .order('id', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+        $('#classrooms_list_add').html('<tr><td colspan="3">لا توجد فصول متاحة حالياً</td></tr>');
+        return;
+    }
+
+    var html = '';
+    data.forEach(cls => {
+        var classNum = getClassNumber(cls.class_code);
+        html += `<tr>
+            <td style="font-weight:800; text-align:right; padding-right:15px;">${cls.class_name}</td>
+            <td><code style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:4px; font-weight:bold;">${classNum}</code></td>
+            <td>
+                <button class="desine-btn" style="padding:5px 12px; font-size:0.8rem; background:#10b981; margin:0;" onclick="manageSingleClassroom('${cls.class_code}', '${escapeHtml(cls.class_name)}')"><i class="fas fa-door-open"></i> فتح الفصل</button>
+            </td>
+        </tr>`;
+    });
+
+    $('#classrooms_list_add').html(html);
+}
+
+async function manageSingleClassroom(code, name) {
+    go_page('page_classroom_single');
+    $('#single_cls_title').text('إدارة فصل: ' + name);
+    $('#single_cls_code').text(code);
+    window.currentManagingClassCode = code;
+
+    let isTeacher = (localStorage.getItem('loginState') === 'login=OK');
+    if (isTeacher) {
+        $('#teacher_add_exam_to_cls_box').show();
+        $('#teacher_add_content_box').show();
+        $('#students_section_container').show(); // إظهار قسم الطلاب للمعلم
+    } else {
+        $('#teacher_add_exam_to_cls_box').hide();
+        $('#teacher_add_content_box').hide();
+        $('#students_section_container').hide(); // إخفاء قسم الطلاب عن الطالب
+    }
+
+    loadSingleClassroomExams(code);
+    loadSingleClassroomContents(code);
+    loadSingleClassroomStudents(code);
+}
+
+async function loadSingleClassroomExams(code) {
+    $('#single_cls_exams_container').html('جاري تحميل الاختبارات...');
+    let { data, error } = await window._supabase
+        .from('classroom_exams')
+        .select('*')
+        .eq('class_code', code);
+
+    if (error || !data || data.length === 0) {
+        $('#single_cls_exams_container').html('<p style="color:#64748b;">لا توجد اختبارات مرتبطة بهذا الفصل.</p>');
+        return;
+    }
+
+    let html = '<ul style="list-style:none; padding:0; text-align:right; display:flex; flex-direction:column; gap:12px;">';
+    data.forEach(ex => {
+        html += `<li style="background:#ffffff; border:1.5px solid #e2e8f0; padding:0; margin:0; border-radius:14px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); transition:all 0.2s ease;">
+            
+            <!-- الجزء العلوي: معلومات الاختبار -->
+            <div style="padding:16px 18px 12px 18px; background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border-bottom:1px solid #e2e8f0;">
+                
+                <!-- عنوان الاختبار -->
+                <h5 style="margin:0 0 10px 0; color:#1e293b; font-size:1rem; font-weight:800; line-height:1.5; word-break:break-word; overflow-wrap:break-word; text-align:right;">
+                    <i class="fas fa-file-alt" style="color:#3b82f6; margin-left:8px;"></i>${ex.exam_name}
+                </h5>
+                
+                <!-- رقم الاختبار -->
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <span style="color:#64748b; font-size:0.8rem; font-weight:600;">رقم الاختبار:</span>
+                    <code style="background:#dbeafe; color:#1e40af; padding:4px 12px; border-radius:6px; font-size:0.85rem; font-weight:800; letter-spacing:0.5px; border:1px solid #bfdbfe;">${ex.exam_number}</code>
+                </div>
+                
+            </div>
+            
+            <!-- الجزء السفلي: زر الفتح -->
+            <div style="padding:14px 18px; background:#ffffff; display:flex; justify-content:flex-end; align-items:center;">
+                <button class="desine-btn" style="padding:12px 24px; font-size:0.9rem; background:linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); margin:0; border-radius:10px; min-width:140px; text-align:center; font-weight:800; border:none; box-shadow:0 4px 12px rgba(37,99,235,0.3); color:#fff; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(37,99,235,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(37,99,235,0.3)'" onclick="searchAndStartExamByNum(${ex.exam_number})">
+                    <i class="fas fa-play-circle" style="margin-left:6px;"></i> فتح الاختبار
+                </button>
+            </div>
+            
+        </li>`;
+    });
+    html += '</ul>';
+    $('#single_cls_exams_container').html(html);
+}
+
+async function publishExamToSingleClass() {
+    let examNum = $('#single_link_exam_num').val();
+    let code = window.currentManagingClassCode;
+
+    if (!examNum) {
+        alert('الرجاء إدخال رقم الاختبار');
+        return;
+    }
+
+    let { data: examData, error: examErr } = await window._supabase
+        .from('exams')
+        .select('*')
+        .eq('exam_number', Number(examNum))
+        .single();
+
+    if (examErr || !examData) {
+        alert('رقم الاختبار غير موجود في السحابة.');
+        return;
+    }
+
+    let { error } = await window._supabase
+        .from('classroom_exams')
+        .insert([
+            {
+                class_code: code,
+                exam_number: Number(examNum),
+                exam_name: String(examData.exam_name)
+            }
+        ]);
+
+    if (error) {
+        if (error.code === '23505') {
+            alert('هذا الاختبار منشور مسبقاً في هذا الفصل.');
+        } else {
+            alert('خطأ أثناء ربط الاختبار: ' + error.message);
+        }
+    } else {
+        alert('تم نشر الاختبار في الفصل بنجاح!');
+        $('#single_link_exam_num').val('');
+        loadSingleClassroomExams(code);
+    }
+}
+
+async function removeExamFromClass(relId, code) {
+    if (!confirm('هل تريد إزالة هذا الاختبار من الفصل؟')) return;
+    let { error } = await window._supabase.from('classroom_exams').delete().eq('id', relId);
+    if (!error) loadSingleClassroomExams(code);
+}
+
+// ===== دالة عرض المحتوى (تم تعديل التنسيق فقط) =====
+async function loadSingleClassroomContents(code) {
+    let { data } = await window._supabase
+        .from('classroom_contents')
+        .select('*')
+        .eq('class_code', code)
+        .order('id', { ascending: false });
+
+    if (!data || data.length === 0) {
+        $('#single_cls_content_container').html('<p style="color:#64748b; text-align:center; padding:20px; background:#f8fafc; border-radius:10px; border:1px dashed #cbd5e1;">لا توجد محتويات أو إعلانات منشورة بعد.</p>');
+        return;
+    }
+
+    let html = '<div style="display:flex; flex-direction:column; gap:16px;">';
+
+    data.forEach(item => {
+        let badgeColor = item.content_type === 'homework' ? '#dc2626' : item.content_type === 'link' ? '#0284c7' : '#4338ca';
+        let badgeName = item.content_type === 'homework' ? '📝 واجب دراسي' : item.content_type === 'link' ? '🔗 رابط خارجي' : '📢 إعلان وشرح';
+        let icon = item.content_type === 'homework' ? 'fa-tasks' : item.content_type === 'link' ? 'fa-link' : 'fa-bullhorn';
+
+        let bodyContent = '';
+        if (item.body && (item.body.startsWith('http://') || item.body.startsWith('https://'))) {
+            bodyContent = `
+                <div style="margin-top:12px; text-align:center;">
+                    <a href="${item.body}" target="_blank" class="desine-btn" style="background:#0284c7; display:inline-block; padding:10px 35px; text-decoration:none; border-radius:10px; font-weight:800; font-size:0.95rem; box-shadow:0 4px 12px rgba(2,132,199,0.3); transition:0.2s;">
+                        <i class="fas fa-external-link-alt"></i> فتح الرابط
+                    </a>
+                </div>
+            `;
+        } else {
+            bodyContent = `<p style="margin:8px 0 0 0; white-space:pre-wrap; color:#334155; font-weight:600; line-height:1.8; font-size:0.95rem;">${item.body}</p>`;
+        }
+
+        html += `
+            <div style="background:#ffffff; border-radius:14px; border:1.5px solid #e2e8f0; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:all 0.2s ease;">
+                
+                <!-- رأس البطاقة: نوع المحتوى -->
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 20px; background:linear-gradient(135deg, ${badgeColor}15 0%, ${badgeColor}08 100%); border-bottom:1px solid #e2e8f0;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="background:${badgeColor}; color:#fff; padding:4px 14px; border-radius:20px; font-size:0.75rem; font-weight:800; letter-spacing:0.3px;">
+                            <i class="fas ${icon}"></i> ${badgeName}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- جسم البطاقة: العنوان + المحتوى -->
+                <div style="padding:16px 20px 20px 20px;">
+                    <h5 style="margin:0 0 6px 0; color:#1e293b; font-size:1.05rem; font-weight:800; text-align:right;">
+                        <i class="fas fa-tag" style="color:#64748b; margin-left:8px; font-size:0.85rem;"></i>
+                        ${item.title}
+                    </h5>
+                    ${bodyContent}
+                </div>
+                
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    $('#single_cls_content_container').html(html);
+}
+
+async function publishContentToClass() {
+    let title = $('#cls_content_title').val();
+    let body = $('#cls_content_body').val();
+    let code = window.currentManagingClassCode;
+
+    if (!title || !body) {
+        alert('الرجاء إدخال عنوان ومحتوى الإعلان أو الواجب');
+        return;
+    }
+
+    let { error } = await window._supabase
+        .from('classroom_contents')
+        .insert([{ class_code: code, title: title, body: body }]);
+
+    if (error) {
+        alert('خطأ أثناء النشر: ' + error.message);
+    } else {
+        alert('تم نشر المحتوى بنجاح لجميع طلاب الفصل!');
+        $('#cls_content_title').val('');
+        $('#cls_content_body').val('');
+        loadSingleClassroomContents(code);
+    }
+}
+
+async function loadSingleClassroomStudents(code) {
+    let { data } = await window._supabase
+        .from('classroom_students')
+        .select('*')
+        .eq('class_code', code);
+
+    if (!data || data.length === 0) {
+        $('#single_cls_students_list').html('<p style="color:#64748b; margin:0;">لا يوجد طلاب منضمين حتى الآن.</p>');
+        return;
+    }
+
+    let html = '<ul style="margin:0; padding-right:20px; text-align:right;">';
+    data.forEach((s, idx) => {
+        html += `<li><b>${idx + 1}. ${s.student_name}</b></li>`;
+    });
+    html += '</ul>';
+    $('#single_cls_students_list').html(html);
+}
+
+async function searchAndStartExamByNum(examNum) {
+    $('#load').show();
+    let { data, error } = await window._supabase
+        .from('exams')
+        .select('*')
+        .eq('exam_number', Number(examNum))
+        .single();
+    $('#load').hide();
+
+    if (error || !data) {
+        alert('تعذر فتح الاختبار');
+        return;
+    }
+
+    window.currentLoadedExam = data;
+    downloadExam_new();
+}
+
+async function deleteClassroom(clsId) {
+    if (!confirm('هل أنت متأكد من حذف هذا الفصل الدراسي؟')) return;
+
+    let { error } = await window._supabase
+        .from('classrooms')
+        .delete()
+        .eq('id', clsId);
+
+    if (error) {
+        alert('خطأ أثناء الحذف: ' + error.message);
+    } else {
+        alert('تم حذف الفصل بنجاح');
+        loadTeacherClassrooms();
+    }
+}
+
+function teacherLogout() {
+    if (!confirm('هل أنت متأكد من رغبتك في تسجيل الخروج من وضع المعلم؟')) return;
+
+    localStorage.removeItem('loginState');
+    localStorage.removeItem('loginEmail');
+    localStorage.removeItem('teacher_pass_hash');
+    window.loginState = '';
+    window.loginEmail = '';
+
+    $('#loginEmail').text('');
+    $('#logout_btn').hide();
+    
+    alert('تم تسجيل الخروج بنجاح.');
+    go_page('page_home');
+}
+
+$(document).ready(function() {
+    readAll_ans_saveded_new();
+    if (localStorage.getItem('loginState') === 'login=OK') {
+        window.loginState = 'login=OK';
+        window.loginEmail = localStorage.getItem('loginEmail');
+        $('#loginEmail').text('مرحباً بك: ' + window.loginEmail);
+        $('#logout_btn').show();
+        readAll_exam_saveded_new();
+    } else {
+        $('#logout_btn').hide();
+        readAll_student_exams_sync([]);
+    }
+});
