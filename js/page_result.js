@@ -1,82 +1,237 @@
-function result_exam(_0xea69x2) { numForExcel = _0xea69x2;
-    $('#showresult')['html']('<tr><td colspan="6"><img id="img_load_result" src="img/load.gif" /></td></tr>');
-    $['ajax']({ type: 'GET', url: 'https://app-exams.com/new_exam/get_result_exam_new.php?id=' + _0xea69x2, success: function(_0xea69x3) { dataSavePDF = _0xea69x3;
-            $('#showresult')['empty']();
-            $('#showresult')['append'](_0xea69x3);
-            $('#page_mytest')['clone']()['appendTo']('#copy_page_mytest'); if (+versionExam < 41) { $['ajax']({ type: 'GET', url: 'https://app-exams.com/result_s_num.php?id=' + _0xea69x2, success: function(_0xea69x3) { if (_0xea69x3 != '<tr><td colspan="6">' + lan_No_results_yet + ' !</td></tr>') { $('#showresult')['append'](_0xea69x3) } } }) } }, error: function() { Swal['fire']({ type: 'info', html: lan_There_is_problem_connecting_network, showConfirmButton: false, timer: 1500 }) } }) }
+let currentExamResultsCache = [];
 
-function result_exam_one_std(_0xea69x5, _0xea69x6, _0xea69x7) { if (_0xea69x6 == 'demo') { numForExcel = _0xea69x7 };
-    $['ajax']({ type: 'POST', url: 'https://app-exams.com/new_exam/get_result_exam_one_std_2plus.php?id=' + _0xea69x5, data: { num_exam: numForExcel + '', demo_std: _0xea69x6 + '' }, success: function(_0xea69x3) { $('#showresult')['append'](_0xea69x3) }, error: function() { Swal['fire']({ type: 'info', html: lan_There_is_problem_connecting_network, showConfirmButton: false, timer: 1500 }) } }) }
+async function load_exam_results(exam_number) {
+    if (!exam_number) return;
+    window.currentExamNumberForResults = exam_number;
 
-function backToPrev_page() { go_page(localStorage['prev_page_demo']);
-    $('#add_ask_here')['empty']();
-    $('#nav-bottom')['slideDown']();
-    nav_bottomm = 'show';
-    $('#backToResult')['hide']();
-    $('#shows_name')['val']('');
-    $('#shows_name')['prop']('disabled', false);
-    $('#shows_num')['val']('');
-    $('#shows_num')['prop']('disabled', false);
-    $('#shows_info')['val']('');
-    $('#shows_info')['prop']('disabled', false);
-    $('.AskRandom')['css']('display', 'block') }
+    $('#showresult').html('<tr><td colspan="5"><img id="img_load_result" src="img/load.gif" /></td></tr>');
+    
+    let { data, error } = await window._supabase
+        .from('results')
+        .select('*')
+        .eq('exam_number', exam_number)
+        .order('submitted_at', { ascending: false });
 
-function Correcting_Mqali() { count_Correcting_Mqali++;
-    getDegreeAllMqali = '<script> if (std.kindQ' + count_Correcting_Mqali + ' == \'mqali\') { std.degreMqali' + count_Correcting_Mqali + ' = parseArabic($(\'#degreMqali' + count_Correcting_Mqali + '\').val()); std.degre_std_all_mqali += parseArabic($(\'#degreMqali' + count_Correcting_Mqali + '\').val()); }</' + 'script>';
-    add_script_for_getDegreeAllMqali_loop() }
+    if (error) {
+        alert('خطأ في جلب النتائج: ' + error.message);
+        $('#showresult').html('<tr><td colspan="5">حدث خطأ في جلب النتائج</td></tr>');
+        return;
+    }
 
-function add_script_for_getDegreeAllMqali_loop() { $('#add_ask_here')['append'](getDegreeAllMqali); if (obj['count_ask'] > count_Correcting_Mqali) { Correcting_Mqali() } else { tafaseel_Student_Data = JSON['stringify'](std);
-        $['ajax']({ type: 'POST', url: 'https://app-exams.com/new_exam/update_answer.php?id=' + std['answers_id'], data: { answers_data: tafaseel_Student_Data + '', num_exam: numForExcel + '' }, success: function(_0xea69x3) { Swal['fire']({ type: 'success', html: lan_degree_added_student, showConfirmButton: false, timer: 1500 });
-                examNum = JSON['parse'](data_exam);
-                result_exam(examNum['t_num']) }, error: function() { Swal['fire']({ type: 'info', html: lan_There_is_problem_connecting_network, showConfirmButton: false, timer: 1500 }) } }) } }
+    currentExamResultsCache = data || [];
+    renderResultsTable(currentExamResultsCache);
+}
 
-function save_pdf() { $('#showresult')['empty']();
-    $('#copy_page_mytest')['empty']();
-    $('#showresult')['append'](dataSavePDF);
-    $('#page_mytest')['clone']()['appendTo']('#copy_page_mytest');
-    $('.page_mytest')['css']('display', 'block');
-    $('.page_mytest:last-child')['css']('display', 'none');
-    $('#copy_page_mytest')['fadeIn']();
-    $('#page_mytest')['fadeOut']();
-    $('#backToResult')['hide']();
-    $('#nav-bottom')['slideUp']();
-    setTimeout(function() { $('body')['css']('backgroundColor', '#fff');
-        $('.page_mytest')['css']('margin-top', '-75px');
-        $('hr')['css']('display', 'none');
-        nav_bottomm = 'show'; if (deviceManufacturer == 'Android' || deviceManufacturer == 'android' || deviceManufacturer == 'ANDROID') { navigator['notification']['alert'](lan_how_save_pdf_from_cam, _0xea69xc, '', lan_ok) } else { if (deviceManufacturer == 'Apple' || deviceManufacturer == 'APPLE' || deviceManufacturer == 'apple') { navigator['notification']['alert'](lan_how_save_pdf, _0xea69xc, '', lan_ok) } else { window['print']() } } }, 1000);
+function renderResultsTable(resultsArray) {
+    if (!resultsArray || resultsArray.length === 0) {
+        $('#showresult').html('<tr><td colspan="5">لا توجد نتائج مسجلة للطلاب حتى الآن</td></tr>');
+        return;
+    }
 
-    function _0xea69xc() { cordova['plugins']['printer']['print']() } }
+    let honorBoardBtnContainer = $('#honor_board_btn_wrapper');
+    if (honorBoardBtnContainer.length === 0) {
+        $('#option_result').after(`<div id="honor_board_btn_wrapper" style="text-align:center; margin:10px auto;">
+            <button class="desine-btn" style="background:#f59e0b; padding:8px 18px; font-size:0.9rem;" onclick="showHonorBoardModal()"><i class="fas fa-award"></i> عرض لوحة الشرف (98% - 100%)</button>
+        </div>`);
+    }
 
-function save_pdf_one_std() { $('textarea')['autogrow']();
-    setTimeout(function() { $('#nav-bottom')['slideUp']() }, 500);
-    setTimeout(function() { $('body')['css']('backgroundColor', '#fff');
-        $('hr')['css']('display', 'none'); if (deviceManufacturer == 'Android' || deviceManufacturer == 'android' || deviceManufacturer == 'ANDROID') { navigator['notification']['alert'](lan_how_save_pdf_from_cam, _0xea69xc, '', lan_ok) } else { if (deviceManufacturer == 'Apple' || deviceManufacturer == 'APPLE' || deviceManufacturer == 'apple') { navigator['notification']['alert'](lan_how_save_pdf, _0xea69xc, '', lan_ok) } else { window['print']() } } }, 1000);
+    var html = '';
+    resultsArray.forEach((res, index) => {
+        let dateStr = res.submitted_at ? new Date(res.submitted_at).toLocaleString('ar-SA') : 'وقت غير متوفر';
+        let encodedResData = encodeURIComponent(JSON.stringify(res));
 
-    function _0xea69xc() { cordova['plugins']['printer']['print']() } }
+        html += `<tr>
+            <td>${index + 1}</td>
+            <td><b>${res.student_name}</b></td>
+            <td>${res.student_info || '-'}</td>
+            <td><span style="font-size:12px; color:#64748b;">${dateStr}</span></td>
+            <td>
+                <div style="display:flex; gap:5px; justify-content:center; align-items:center;">
+                    <b style="color:#0284c7; font-size:1.05em;">${res.degree}</b>
+                    <button class="desine-btn" style="padding:4px 8px; font-size:0.75rem; background:#4338ca; margin:0;" onclick="reviewStudentPaper('${encodedResData}')" title="مراجعة إجابات الطالب"><i class="fas fa-eye"></i> مراجعة</button>
+                </div>
+            </td>
+        </tr>`;
+    });
 
-function save_excel() { if (loginState != 'login=OK') { Swal['fire']({ type: 'warning', html: 'Please login first' }) } else { $('#load')['css']('display', 'inline-block');
-        $['ajax']({ type: 'GET', url: 'https://app-exams.com/new_exam/export_excel.php?id=' + numForExcel, success: function(_0xea69x3) { if (_0xea69x3 == 'null' || _0xea69x3 == 'false') { Swal['fire']({ type: 'warning', html: lan_There_is_no_exam_number }) } else { Swal['fire']({ title: lan_please_wait, html: lan_Preparing_file, onBeforeOpen: function _0xea69xf() { Swal['showLoading']() } });
-                    ExportJSON(_0xea69x3) } }, error: function() { Swal['fire']({ type: 'info', html: lan_There_is_problem_connecting_network, showConfirmButton: false, timer: 1500 });
-                $('#load')['css']('display', 'none') } }) } }
+    $('#showresult').html(html);
+}
 
-function ExportJSON(_0xea69x11) { var _0xea69x3 = '[' + _0xea69x11 + ']'; var _0xea69x12 = 'https://exporter.azurewebsites.net/api/export/ExportFromJSON/5';
-    Export(_0xea69x12, _0xea69x3); return false }
+function showHonorBoardModal() {
+    let resultsArray = currentExamResultsCache || [];
+    let honorStudents = resultsArray.filter(res => {
+        if (!res.degree) return false;
+        let parts = String(res.degree).split('/');
+        if (parts.length === 2) {
+            let obtained = parseFloat(parts[0]);
+            let total = parseFloat(parts[1]);
+            if (total > 0) {
+                let percentage = (obtained / total) * 100;
+                return percentage >= 98;
+            }
+        }
+        return false;
+    });
 
-function Export(_0xea69x14, _0xea69x3) { $['ajax']({ type: 'POST', url: _0xea69x14, data: JSON['stringify']({ 'data': _0xea69x3 }), datatype: 'JSON', contentType: 'application/json; charset=utf-8' })['done'](function(_0xea69x16) { var _0xea69x17 = 'https://exporter.azurewebsites.net/api/export/GetFile/' + _0xea69x16;
-        _0xea69x17 += '?fileName=Results-' + numForExcel + '&extension=xlsx';
-        toMail = localStorage['loginEmail'].toString();
-        subject = lan_Temporary_link + numForExcel;
-        msssg = _0xea69x17.toString(); if (deviceManufacturer == 'Apple' || deviceManufacturer == 'APPLE' || deviceManufacturer == 'apple' || deviceManufacturer == 'Android' || deviceManufacturer == 'android' || deviceManufacturer == 'ANDROID') { Swal['fire']({ title: lan_file_was_prepared, html: lan_will_ceate_link, type: 'success', confirmButtonText: lan_word_next })['then'](function() { cordova_save_Excel() }) } else { $('#load')['css']('display', 'none');
-            Swal['fire']({ title: lan_file_was_prepared, html: lan_will_ceate_link, type: 'success', confirmButtonText: lan_word_next })['then'](function() { document['location']['href'] = 'mailto:' + localStorage['loginEmail'] + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(_0xea69x17) }) } })['fail'](function(_0xea69x15) { $('#load')['css']('display', 'none');
-        Swal['fire']({ type: 'info', html: lan_Please_try_again_later }) }) }
+    let honorHtml = `<div id="honor_board_modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:99999; display:flex; align-items:center; justify-content:center;">
+        <div style="background:#fff; padding:30px; border-radius:20px; width:92%; max-width:500px; max-height:85vh; overflow-y:auto; text-align:center; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);">
+            <div style="font-size:3rem; color:#f59e0b; margin-bottom:5px;"><i class="fas fa-award"></i></div>
+            <h2 style="color:var(--primary); margin-top:0;">لوحة الشرف والتميز</h2>
+            <p style="color:var(--text-muted); font-size:0.95rem;">نخبة الطلاب الحاصلين على نسبة إتقان تفوق 98% في هذا الاختبار</p>
+            <hr style="margin:20px 0;">`;
 
-function cordova_save_Excel() { $('#load')['css']('display', 'none');
-    cordova['plugins']['email']['open']({ to: toMail, subject: subject, body: msssg }) }
+    if (honorStudents.length === 0) {
+        honorHtml += `<p style="color:#64748b; padding:20px;">لا يوجد طلاب ضمن لوحة الشرف (98% فأكثر) حتى الآن.</p>`;
+    } else {
+        honorHtml += `<table style="width:100%; margin:0; border:none; box-shadow:none;">
+            <thead>
+                <tr>
+                    <th>المرتبة</th>
+                    <th>اسم الطالب</th>
+                    <th>الدرجة</th>
+                </tr>
+            </thead>
+            <tbody>`;
+        
+        honorStudents.forEach((st, idx) => {
+            let medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '⭐';
+            honorHtml += `<tr>
+                <td><b>${medal} #${idx + 1}</b></td>
+                <td><b>${st.student_name}</b></td>
+                <td><span style="background:#dcfce7; color:#166534; padding:3px 8px; border-radius:6px; font-weight:bold;">${st.degree}</span></td>
+            </tr>`;
+        });
 
-function delete_result(_0xea69x1a, _0xea69x1b) { if (_0xea69x1a == 'deleteExam') { _0xea69x1b = _0xea69x1b;
-        msg_delete = lan_msg_delete_examAndRes } else { _0xea69x1a = 'ansONLY';
-        _0xea69x1b = numForExcel;
-        msg_delete = lan_msg_delete_resultOnly };
-    ss = _0xea69x1b;
-    Swal['fire']({ title: lan_You_about_delete, html: msg_delete, type: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: lan_word_delete, cancelButtonText: lan_Undo })['then'](function(_0xea69x16) { if (_0xea69x16['value']) { $['ajax']({ type: 'POST', url: 'https://app-exams.com/new_exam/delete_exam_ans.php', data: { deleteExam: _0xea69x1a + '', num_deleteExam: _0xea69x1b + '' }, success: function(_0xea69x3) { if (_0xea69x3 == 'done_exam and ans') { readAll_exam_saveded_new();
-                        Swal['fire']({ type: 'success', html: lan_msg_success_exam_deleted, showConfirmButton: false, timer: 1500 }) } else { if (_0xea69x3 == 'done_ans') { Swal['fire']({ type: 'success', html: lan_msg_success_exam_deleted, showConfirmButton: false, timer: 2000 }) } }; if (_0xea69x1a == 'deleteExam') { remove_exam_te(_0xea69x1b, 'deleteExam') } else { result_exam(numForExcel) } }, error: function() { Swal['fire']({ type: 'info', html: lan_There_is_problem_connecting_network, showConfirmButton: false, timer: 1500 }) } }) } }) }
+        honorHtml += `</tbody></table>`;
+    }
+
+    honorHtml += `<br>
+            <button class="desine-btn" style="width:100%; background:#64748b; padding:12px; margin-top:15px;" onclick="$('#honor_board_modal').remove()">إغلاق لوحة الشرف</button>
+        </div>
+    </div>`;
+
+    $('#honor_board_modal').remove();
+    $('body').append(honorHtml);
+}
+
+async function reviewStudentPaper(encodedJson) {
+    let resObj = JSON.parse(decodeURIComponent(encodedJson));
+    let examNum = resObj.exam_number;
+
+    let { data: examData, error } = await window._supabase
+        .from('exams')
+        .select('*')
+        .eq('exam_number', examNum)
+        .single();
+
+    let questionsList = examData?.exam_data?.questions || [];
+    let studentAnswers = resObj.answers_data || {};
+    var numbers = ['❶', '❷', '❸', '❹'];
+
+    let modalHtml = `<div id="student_review_modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:99999; display:flex; align-items:center; justify-content:center;">
+        <div style="background:#fff; padding:25px; border-radius:16px; width:92%; max-width:650px; max-height:85vh; overflow-y:auto; text-align:right; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);">
+            <h3 style="color:var(--primary); margin-top:0; text-align:center;"><i class="fas fa-clipboard-check"></i> مراجعة إجابات الطالب</h3>
+            <div style="background:#f1f5f9; padding:12px; border-radius:8px; text-align:center; margin-bottom:15px;">
+                <p style="margin:0; font-size:1.05rem; font-weight:800; color:#1e293b;">اسم الطالب: ${resObj.student_name}</p>
+                <p style="margin:4px 0 0 0; color:#64748b; font-size:0.9rem;">الدرجة النهائية: <b>${resObj.degree}</b> | معلومات إضافية: ${resObj.student_info || 'لا توجد'}</p>
+            </div>
+            <hr>`;
+
+    if (questionsList.length === 0) {
+        modalHtml += `<p style="text-align:center; color:#ef4444;">تعذر العثور على تفاصيل أسئلة هذا الاختبار.</p>`;
+    } else {
+        questionsList.forEach((q, qIdx) => {
+            let stdAns = studentAnswers['q_' + qIdx] || 'لم يجب';
+            let correctAns = (q.options && q.options.length > 0) ? q.options[0] : '';
+            let isCorrect = (stdAns === correctAns && stdAns !== 'لم يجب');
+            let boxBg = isCorrect ? '#f0fdf4' : '#fef2f2';
+            let boxBorder = isCorrect ? '#bbf7d0' : '#fecaca';
+            let badgeText = isCorrect ? '<span style="color:#16a34a; font-weight:bold;">إجابتك صحيحة ✓</span>' : '<span style="color:#dc2626; font-weight:bold;">إجابتك خاطئة ✗</span>';
+
+            modalHtml += `<div style="background:${boxBg}; padding:20px; margin:15px 0; border-radius:12px; border:1.5px solid ${boxBorder};">
+                <p style="font-weight:800; color:#1e293b; margin-bottom:5px;">السؤال رقم ${qIdx + 1}</p>
+                <div style="width:100%; min-height:45px; padding:12px 14px; border-radius:8px; border:1.5px solid var(--border-color); background-color:#f8fafc; color:#0f172a; font-weight:750; margin-bottom:15px; white-space:pre-wrap; word-break:break-word;">${q.question || ''}</div>`;
+            
+            if (q.options && q.options.length > 0) {
+                q.options.forEach((opt, oIndex) => {
+                    if (opt) {
+                        let isSelected = (stdAns === opt);
+                        let optStyle = isSelected ? 'border-color:#2563eb; background:#eff6ff; font-weight:800;' : 'background:#ffffff;';
+                        
+                        modalHtml += `<div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; margin:8px 0; border-radius:8px; border:1.5px solid #cbd5e1; ${optStyle}">
+                            <div style="display:flex; align-items:center;">
+                                <span style="font-size:1.1rem; margin-left:10px; font-weight:800; color:#4338ca;">${numbers[oIndex] || ''}</span>
+                                <span>${opt} ${isSelected ? '(اختيار الطالب)' : ''}</span>
+                            </div>
+                        </div>`;
+                    }
+                });
+            }
+
+            modalHtml += `<p style="margin:10px 0 0 0; font-size:0.95rem; font-weight:bold;">حالة الإجابة: [ ${badgeText} ]</p>`;
+            
+            if (!isCorrect) {
+                modalHtml += `<p style="margin:6px 0 0 0; font-size:0.95rem; color:#16a34a; font-weight:bold;">الإجابة الصحيحة النموذجية: ${correctAns}</p>`;
+            }
+
+            modalHtml += `</div>`;
+        });
+    }
+
+    modalHtml += `<br>
+            <button class="desine-btn" style="width:100%; background:#64748b; padding:12px;" onclick="$('#student_review_modal').remove()">إغلاق المراجعة</button>
+        </div>
+    </div>`;
+
+    $('#student_review_modal').remove();
+    $('body').append(modalHtml);
+}
+
+function sortResultsByCriteria(criteria) {
+    if (!currentExamResultsCache || currentExamResultsCache.length === 0) return;
+
+    let sorted = [...currentExamResultsCache];
+
+    if (criteria === 'date') {
+        sorted.sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at));
+    } else if (criteria === 'degree_desc') {
+        sorted.sort((a, b) => Number(b.degree) - Number(a.degree));
+    } else if (criteria === 'degree_asc') {
+        sorted.sort((a, b) => Number(a.degree) - Number(b.degree));
+    } else if (criteria === 'name') {
+        sorted.sort((a, b) => a.student_name.localeCompare(b.student_name, 'ar'));
+    }
+
+    renderResultsTable(sorted);
+}
+
+async function delete_result() {
+    var exam_number = window.currentExamNumberForResults;
+    if (!exam_number) {
+        alert('رقم الاختبار غير محدد');
+        return;
+    }
+
+    if (!confirm('هل أنت متأكد من حذف جميع نتائج هذا الاختبار نهائياً؟')) {
+        return;
+    }
+
+    $('#load').show();
+    let { error } = await window._supabase
+        .from('results')
+        .delete()
+        .eq('exam_number', exam_number);
+
+    $('#load').hide();
+
+    if (error) {
+        alert('خطأ أثناء حذف النتائج: ' + error.message);
+    } else {
+        alert('تم حذف النتائج بنجاح');
+        load_exam_results(exam_number);
+    }
+}
+
+function save_excel() {
+    alert('تم تجهيز البيانات، سيتم تصدير ملف النتائج بصيغة Excel قريباً.');
+}
